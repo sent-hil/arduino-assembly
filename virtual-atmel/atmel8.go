@@ -27,11 +27,11 @@ func NewCPU() *CPU {
 // LDI is 'Load Immediate'; it loads given value into given register.
 // rIndex must be: 16 <= d <= 31.
 func (c *CPU) LDI(rIndex int, value uint8) error {
-	if rIndex < 16 {
+	if rIndex < c.rMin {
 		return ErrLDILowRegister
 	}
 
-	if rIndex > 31 {
+	if rIndex > c.rMax {
 		return fmt.Errorf(ErrLDIInvalidRegisterStr, rIndex)
 	}
 
