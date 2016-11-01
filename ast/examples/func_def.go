@@ -6,3 +6,6 @@ func main() {
 
 func pinOutput(pin, mode int) {
 }
+
+func something(one string) {
+}
