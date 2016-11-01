@@ -11,31 +11,31 @@ var (
 )
 
 type CPU struct {
-	registers   []uint8
-	registerMin int
-	registerMax int
+	registers []uint8
+	rMin      int
+	rMax      int
 }
 
 func NewCPU() *CPU {
 	return &CPU{
-		registers:   make([]uint8, 16, 16),
-		registerMin: 16,
-		registerMax: 31,
+		registers: make([]uint8, 16, 16),
+		rMin:      16,
+		rMax:      31,
 	}
 }
 
 // LDI is 'Load Immediate'; it loads given value into given register.
-// registerIndex must be: 16 <= d <= 31.
-func (c *CPU) LDI(registerIndex int, value uint8) error {
-	if registerIndex < 16 {
+// rIndex must be: 16 <= d <= 31.
+func (c *CPU) LDI(rIndex int, value uint8) error {
+	if rIndex < 16 {
 		return ErrLDILowRegister
 	}
 
-	if registerIndex > 31 {
-		return fmt.Errorf(ErrLDIInvalidRegisterStr, registerIndex)
+	if rIndex > 31 {
+		return fmt.Errorf(ErrLDIInvalidRegisterStr, rIndex)
 	}
 
-	c.registers[registerIndex-c.registerMin] = value
+	c.registers[rIndex-c.rMin] = value
 
 	return nil
 }
