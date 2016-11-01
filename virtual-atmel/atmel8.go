@@ -1,10 +1,13 @@
 package atmel8
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
-	ErrLessThanMinRegister = errors.New("Given register index is less than minimum allowed value")
-	ErrMoreThanMaxRegister = errors.New("Given register index is more than maximum allowed value")
+	ErrLDILowRegister        = errors.New("ldi can only use a high register (r16 - r31)")
+	ErrLDIInvalidRegisterStr = "R%v is not a valid register"
 )
 
 type CPU struct {
@@ -25,11 +28,11 @@ func NewCPU() *CPU {
 // registerIndex must be: 16 <= d <= 31.
 func (c *CPU) LDI(registerIndex int, value uint8) error {
 	if registerIndex < 16 {
-		return ErrLessThanMinRegister
+		return ErrLDILowRegister
 	}
 
 	if registerIndex > 31 {
-		return ErrMoreThanMaxRegister
+		return fmt.Errorf(ErrLDIInvalidRegisterStr, registerIndex)
 	}
 
 	c.registers[registerIndex-c.registerMin] = value

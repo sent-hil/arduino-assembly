@@ -1,6 +1,7 @@
 package atmel8
 
 import (
+	"fmt"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -11,9 +12,8 @@ func TestCPU(t *testing.T) {
 		Convey("It returns error if register is <16 or > 31", func() {
 			c := NewCPU()
 
-			So(c.LDI(15, 1), ShouldEqual, ErrLessThanMinRegister)
-			So(c.LDI(32, 1), ShouldNotBeNil)
-			So(c.LDI(32, 1), ShouldNotBeNil)
+			So(c.LDI(15, 1), ShouldEqual, ErrLDILowRegister)
+			So(c.LDI(32, 1), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
 		})
 
 		Convey("It loads given uint8 value into given register", func() {
