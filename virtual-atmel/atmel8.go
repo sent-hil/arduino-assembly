@@ -17,6 +17,8 @@ type CPU struct {
 	carryFromLastOp bool
 }
 
+// NewCPU initializes CPU with 32 registers (R0-R31). R16-R31 are exposed to
+// user.
 func NewCPU() *CPU {
 	return &CPU{
 		registers: make([]uint8, 32, 32),
@@ -65,9 +67,11 @@ func (c *CPU) ADD(rDestIndex, rIndex int) error {
 	return nil
 }
 
-// ADD is 'Add with Carry'; it adds two given registers and stores the
-// results in the 1st register. It stores the high if results overflows,
-// which will be used in the next ADD/ADC OP.
+// TODO: make sure this works with OPs that overflows multiple times.
+//
+// ADD is 'Add with Carry'; it adds two given registers and stores the results
+// in the 1st register. It stores the high if results overflows, which will be
+// used in the next ADD/ADC OP.
 //
 // rDestIndex and rIndex must be: 0 <= d <= 31.
 func (c *CPU) ADC(rDestIndex, rIndex int) error {
