@@ -18,7 +18,7 @@ type CPU struct {
 
 func NewCPU() *CPU {
 	return &CPU{
-		registers: make([]uint8, 16, 16),
+		registers: make([]uint8, 32, 32),
 		rMin:      16,
 		rMax:      31,
 	}
@@ -35,7 +35,7 @@ func (c *CPU) LDI(rIndex int, value uint8) error {
 		return fmt.Errorf(ErrLDIInvalidRegisterStr, rIndex)
 	}
 
-	c.registers[rIndex-c.rMin] = value
+	c.registers[rIndex] = value
 
 	return nil
 }

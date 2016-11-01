@@ -21,7 +21,7 @@ func TestCPU(t *testing.T) {
 
 			for i := 16; i <= 31; i++ {
 				So(c.LDI(i, uint8(i)), ShouldBeNil)
-				So(c.registers[i-16], ShouldEqual, i)
+				So(c.registers[i], ShouldEqual, i)
 			}
 
 		})
@@ -30,7 +30,7 @@ func TestCPU(t *testing.T) {
 			c := NewCPU()
 
 			So(c.LDI(16, 0x01), ShouldBeNil)
-			So(c.registers[0], ShouldEqual, 1)
+			So(c.registers[16], ShouldEqual, 1)
 		})
 	})
 }
