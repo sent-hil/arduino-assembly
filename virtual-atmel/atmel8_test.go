@@ -58,13 +58,63 @@ func TestCPU(t *testing.T) {
 			So(c.registers[16], ShouldEqual, 2)
 		})
 
-		Convey("It sets result of addition of 2 registers to 1 register", func() {
+		Convey("It sets result of addition of 2 registers to 1st register", func() {
 			c := NewCPU()
 
 			So(c.LDI(16, 1), ShouldBeNil)
 			So(c.LDI(17, 2), ShouldBeNil)
 			So(c.ADD(16, 17), ShouldBeNil)
 			So(c.registers[16], ShouldEqual, 3)
+		})
+	})
+
+	Convey("ADC", t, func() {
+		Convey("It returns error if given register indexes are not valid", func() {
+			c := NewCPU()
+
+			So(c.ADC(32, 1), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
+			So(c.ADC(1, 32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
+			So(c.ADC(32, 32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
+		})
+
+		Convey("It does same ops as ADD for results < 255", func() {
+			c := NewCPU()
+
+			So(c.LDI(16, 1), ShouldBeNil)
+			So(c.LDI(17, 2), ShouldBeNil)
+			So(c.ADC(16, 17), ShouldBeNil)
+			So(c.registers[16], ShouldEqual, 3)
+		})
+
+		Convey("It wraps around for results that overflows", func() {
+			c := NewCPU()
+
+			So(c.LDI(16, 255), ShouldBeNil)
+			So(c.LDI(17, 1), ShouldBeNil)
+			So(c.ADC(16, 17), ShouldBeNil)
+			So(c.registers[16], ShouldEqual, 0)
+
+			Convey("It uses stored carry next ADD op", func() {
+				// R0 is empty, so result will set only if carry is there
+				So(c.ADD(0, 0), ShouldBeNil)
+				So(c.registers[0], ShouldEqual, 1)
+
+				Convey("It clears carry after being used", func() {
+					So(c.ADD(1, 1), ShouldBeNil)
+					So(c.registers[2], ShouldEqual, 0)
+				})
+			})
+
+			Convey("It uses stored carry next ADC op", func() {
+				// R0 is empty, so result will set only if carry is there
+				So(c.ADC(0, 0), ShouldBeNil)
+				So(c.registers[0], ShouldEqual, 1)
+
+				Convey("It clears carry after being used", func() {
+					So(c.ADD(1, 1), ShouldBeNil)
+					So(c.registers[2], ShouldEqual, 0)
+				})
+			})
 		})
 	})
 }
