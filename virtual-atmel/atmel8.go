@@ -29,17 +29,17 @@ func NewCPU() *CPU {
 
 // LDI is 'Load Immediate'; it loads given value into given register.
 //
-// rIndex must be: 16 <= d <= 31.
-func (c *CPU) LDI(rIndex, value uint8) error {
-	if rIndex < c.rMin {
+// rDestIndex must be: 16 <= d <= 31.
+func (c *CPU) LDI(rDestIndex, value uint8) error {
+	if rDestIndex < c.rMin {
 		return ErrLDILowRegister
 	}
 
-	if rIndex > c.rMax {
-		return fmt.Errorf(ErrLDIInvalidRegisterStr, rIndex)
+	if err := c.checkRegisterOutofRange(rDestIndex); err != nil {
+		return err
 	}
 
-	c.registers[rIndex] = value
+	c.registers[rDestIndex] = value
 
 	return nil
 }
@@ -69,8 +69,8 @@ func (c *CPU) SEC() {
 // INC is 'Increment'; it increments value at register by 1. It OP
 // causes overflow, it does NOT set carry flag.
 func (c *CPU) INC(rDestIndex uint8) error {
-	if rDestIndex > c.rMax {
-		return fmt.Errorf(ErrLDIInvalidRegisterStr, rDestIndex)
+	if err := c.checkRegisterOutofRange(rDestIndex); err != nil {
+		return err
 	}
 
 	c.registers[rDestIndex] += 1
@@ -78,13 +78,11 @@ func (c *CPU) INC(rDestIndex uint8) error {
 	return nil
 }
 
-func (c *CPU) add(rDestIndex, rIndex uint8, carry bool) error {
-	if rDestIndex > c.rMax {
-		return fmt.Errorf(ErrLDIInvalidRegisterStr, rDestIndex)
-	}
+///// private
 
-	if rIndex > c.rMax {
-		return fmt.Errorf(ErrLDIInvalidRegisterStr, rIndex)
+func (c *CPU) add(rDestIndex, rIndex uint8, carry bool) error {
+	if err := c.checkRegisterOutofRange(rDestIndex, rIndex); err != nil {
+		return err
 	}
 
 	v1, v2 := uint16(c.registers[rDestIndex]), uint16(c.registers[rIndex])
@@ -101,6 +99,16 @@ func (c *CPU) add(rDestIndex, rIndex uint8, carry bool) error {
 	}
 
 	c.registers[rDestIndex] = uint8(v1 + v2 + v3)
+
+	return nil
+}
+
+func (c *CPU) checkRegisterOutofRange(rIndexes ...uint8) error {
+	for _, rIndex := range rIndexes {
+		if rIndex > c.rMax {
+			return fmt.Errorf(ErrLDIInvalidRegisterStr, rIndex)
+		}
+	}
 
 	return nil
 }
