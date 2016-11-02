@@ -19,8 +19,9 @@ func TestCPU(t *testing.T) {
 		Convey("It loads given uint8 value into given register", func() {
 			c := NewCPU()
 
-			for i := 16; i <= 31; i++ {
-				So(c.LDI(i, uint8(i)), ShouldBeNil)
+			var i uint8
+			for i = 16; i <= 31; i++ {
+				So(c.LDI(i, i), ShouldBeNil)
 				So(c.registers[i], ShouldEqual, i)
 			}
 

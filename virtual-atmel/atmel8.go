@@ -12,8 +12,8 @@ var (
 
 type CPU struct {
 	registers []uint8
-	rMin      int
-	rMax      int
+	rMin      uint8
+	rMax      uint8
 	carryFlag bool
 }
 
@@ -30,7 +30,7 @@ func NewCPU() *CPU {
 // LDI is 'Load Immediate'; it loads given value into given register.
 //
 // rIndex must be: 16 <= d <= 31.
-func (c *CPU) LDI(rIndex int, value uint8) error {
+func (c *CPU) LDI(rIndex, value uint8) error {
 	if rIndex < c.rMin {
 		return ErrLDILowRegister
 	}
@@ -48,7 +48,7 @@ func (c *CPU) LDI(rIndex int, value uint8) error {
 // results in the 1st register. It sets C flag if result overflows.
 //
 // rDestIndex and rIndex must be: 0 <= d <= 31.
-func (c *CPU) ADD(rDestIndex, rIndex int) error {
+func (c *CPU) ADD(rDestIndex, rIndex uint8) error {
 	return c.add(rDestIndex, rIndex, false)
 }
 
@@ -57,7 +57,7 @@ func (c *CPU) ADD(rDestIndex, rIndex int) error {
 // overflows.
 //
 // rDestIndex and rIndex must be: 0 <= d <= 31.
-func (c *CPU) ADC(rDestIndex, rIndex int) error {
+func (c *CPU) ADC(rDestIndex, rIndex uint8) error {
 	return c.add(rDestIndex, rIndex, true)
 }
 
@@ -68,8 +68,8 @@ func (c *CPU) SEC() {
 
 // INC is 'Increment'; it increments value at register by 1. It OP
 // causes overflow, it does NOT set carry flag.
-func (c *CPU) INC(rDestIndex uint) error {
-	if int(rDestIndex) > c.rMax {
+func (c *CPU) INC(rDestIndex uint8) error {
+	if rDestIndex > c.rMax {
 		return fmt.Errorf(ErrLDIInvalidRegisterStr, rDestIndex)
 	}
 
@@ -78,7 +78,7 @@ func (c *CPU) INC(rDestIndex uint) error {
 	return nil
 }
 
-func (c *CPU) add(rDestIndex, rIndex int, carry bool) error {
+func (c *CPU) add(rDestIndex, rIndex uint8, carry bool) error {
 	if rDestIndex > c.rMax {
 		return fmt.Errorf(ErrLDIInvalidRegisterStr, rDestIndex)
 	}
