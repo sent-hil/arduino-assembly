@@ -66,14 +66,26 @@ func (c *CPU) SEC() {
 	c.carryFlag = true
 }
 
-// INC is 'Increment'; it increments value at register by 1. It OP
-// causes overflow, it does NOT set carry flag.
+// INC is 'Increment'; it increments value at register by 1. It OP causes
+// overflow, it does NOT set carry flag.
 func (c *CPU) INC(rDestIndex uint8) error {
 	if err := c.checkRegisterOutofRange(rDestIndex); err != nil {
 		return err
 	}
 
 	c.registers[rDestIndex] += 1
+
+	return nil
+}
+
+// INC is 'Decrement'; it decrements value at register by 1. It OP causes
+// overflow, it does NOT set carry flag.
+func (c *CPU) DEC(rDestIndex uint8) error {
+	if err := c.checkRegisterOutofRange(rDestIndex); err != nil {
+		return err
+	}
+
+	c.registers[rDestIndex] -= 1
 
 	return nil
 }
