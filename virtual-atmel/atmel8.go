@@ -107,6 +107,11 @@ func (c *CPU) CLR(rDestIndex uint8) error {
 	return nil
 }
 
+// MOV is 'Copy Register'; contrary to name, it only copies values from
+// rOrgIndex to rDestIndex, not move them.
+//
+//
+// rDestIndex and rOrgIndex must be: 0 <= d <= 31.
 func (c *CPU) MOV(rDestIndex, rOrgIndex uint8) error {
 	if err := c.checkRegisterOutofRange(rDestIndex, rOrgIndex); err != nil {
 		return err
@@ -119,6 +124,7 @@ func (c *CPU) MOV(rDestIndex, rOrgIndex uint8) error {
 
 ///// private
 
+// rDestIndex and rIndex must be: 0 <= d <= 31.
 func (c *CPU) add(rDestIndex, rIndex uint8, carry bool) error {
 	if err := c.checkRegisterOutofRange(rDestIndex, rIndex); err != nil {
 		return err
