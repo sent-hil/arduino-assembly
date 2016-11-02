@@ -66,6 +66,18 @@ func (c *CPU) SEC() {
 	c.carryFlag = true
 }
 
+// INC is 'Increment'; it increments value at register by 1. It OP
+// causes overflow, it does NOT set carry flag.
+func (c *CPU) INC(rDestIndex uint) error {
+	if int(rDestIndex) > c.rMax {
+		return fmt.Errorf(ErrLDIInvalidRegisterStr, rDestIndex)
+	}
+
+	c.registers[rDestIndex] += 1
+
+	return nil
+}
+
 func (c *CPU) add(rDestIndex, rIndex int, carry bool) error {
 	if rDestIndex > c.rMax {
 		return fmt.Errorf(ErrLDIInvalidRegisterStr, rDestIndex)

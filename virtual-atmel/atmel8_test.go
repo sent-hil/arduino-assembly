@@ -135,4 +135,35 @@ func TestCPU(t *testing.T) {
 			So(c.registers[0], ShouldEqual, 1)
 		})
 	})
+
+	Convey("INC", t, func() {
+		Convey("It returns error if register is <0 or >31", func() {
+			c := NewCPU()
+
+			So(c.INC(32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
+		})
+
+		Convey("It increments empty value at register by 1", func() {
+			c := NewCPU()
+
+			So(c.INC(31), ShouldBeNil)
+			So(c.registers[31], ShouldEqual, 1)
+		})
+
+		Convey("It increments existing value at register by 1", func() {
+			c := NewCPU()
+
+			So(c.LDI(31, 1), ShouldBeNil)
+			So(c.INC(31), ShouldBeNil)
+			So(c.registers[31], ShouldEqual, 2)
+		})
+
+		Convey("It starts again at 0 if OP causes overflows", func() {
+			c := NewCPU()
+
+			So(c.LDI(31, 255), ShouldBeNil)
+			So(c.INC(31), ShouldBeNil)
+			So(c.registers[31], ShouldEqual, 0)
+		})
+	})
 }
