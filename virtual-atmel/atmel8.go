@@ -107,6 +107,16 @@ func (c *CPU) CLR(rDestIndex uint8) error {
 	return nil
 }
 
+func (c *CPU) MOV(rDestIndex, rOrgIndex uint8) error {
+	if err := c.checkRegisterOutofRange(rDestIndex, rOrgIndex); err != nil {
+		return err
+	}
+
+	c.registers[rDestIndex] = c.registers[rOrgIndex]
+
+	return nil
+}
+
 ///// private
 
 func (c *CPU) add(rDestIndex, rIndex uint8, carry bool) error {

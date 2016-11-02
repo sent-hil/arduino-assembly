@@ -41,7 +41,6 @@ func TestCPU(t *testing.T) {
 
 			So(c.ADD(32, 1), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
 			So(c.ADD(1, 32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
-			So(c.ADD(32, 32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
 		})
 
 		Convey("It adds two register with empty value", func() {
@@ -94,7 +93,6 @@ func TestCPU(t *testing.T) {
 
 			So(c.ADC(32, 1), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
 			So(c.ADC(1, 32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
-			So(c.ADC(32, 32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
 		})
 
 		Convey("It does same ops as ADD for results <255", func() {
@@ -213,6 +211,23 @@ func TestCPU(t *testing.T) {
 			So(c.CLR(31), ShouldBeNil)
 
 			So(c.registers[31], ShouldEqual, 0)
+		})
+	})
+
+	Convey("MOV", t, func() {
+		Convey("It returns error if given register indexes are not valid", func() {
+			c := NewCPU()
+
+			So(c.MOV(32, 1), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
+			So(c.MOV(1, 32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
+		})
+
+		Convey("It stores value from origin register to destination register", func() {
+			c := NewCPU()
+
+			So(c.LDI(16, 1), ShouldBeNil)
+			So(c.MOV(17, 16), ShouldBeNil)
+			So(c.registers[17], ShouldEqual, 1)
 		})
 	})
 }
