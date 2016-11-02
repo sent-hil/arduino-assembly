@@ -125,4 +125,14 @@ func TestCPU(t *testing.T) {
 			})
 		})
 	})
+
+	Convey("SEC", t, func() {
+		Convey("It sets carry flag for next OP", func() {
+			c := NewCPU()
+			c.SEC()
+
+			So(c.ADC(0, 0), ShouldBeNil)
+			So(c.registers[0], ShouldEqual, 1)
+		})
+	})
 }

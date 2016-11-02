@@ -61,6 +61,11 @@ func (c *CPU) ADC(rDestIndex, rIndex int) error {
 	return c.add(rDestIndex, rIndex, true)
 }
 
+// SEC is 'Set Carry Flag'; it sets carry flag.
+func (c *CPU) SEC() {
+	c.carryFromLastOp = true
+}
+
 func (c *CPU) add(rDestIndex, rIndex int, carry bool) error {
 	if rDestIndex > c.rMax {
 		return fmt.Errorf(ErrLDIInvalidRegisterStr, rDestIndex)
