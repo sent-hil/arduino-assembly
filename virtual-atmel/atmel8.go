@@ -68,6 +68,8 @@ func (c *CPU) SEC() {
 
 // INC is 'Increment'; it increments value at register by 1. It OP causes
 // overflow, it does NOT set carry flag.
+//
+// rDestIndex must be: 0 <= d <= 31.
 func (c *CPU) INC(rDestIndex uint8) error {
 	if err := c.checkRegisterOutofRange(rDestIndex); err != nil {
 		return err
@@ -80,12 +82,27 @@ func (c *CPU) INC(rDestIndex uint8) error {
 
 // INC is 'Decrement'; it decrements value at register by 1. It OP causes
 // overflow, it does NOT set carry flag.
+//
+// rDestIndex must be: 0 <= d <= 31.
 func (c *CPU) DEC(rDestIndex uint8) error {
 	if err := c.checkRegisterOutofRange(rDestIndex); err != nil {
 		return err
 	}
 
 	c.registers[rDestIndex] -= 1
+
+	return nil
+}
+
+// CLR is 'Clear Register'; it clears value at given register.
+//
+// rDestIndex must be: 0 <= d <= 31.
+func (c *CPU) CLR(rDestIndex uint8) error {
+	if err := c.checkRegisterOutofRange(rDestIndex); err != nil {
+		return err
+	}
+
+	c.registers[rDestIndex] = 0
 
 	return nil
 }

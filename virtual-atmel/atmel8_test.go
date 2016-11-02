@@ -198,4 +198,21 @@ func TestCPU(t *testing.T) {
 			So(c.registers[31], ShouldEqual, 255)
 		})
 	})
+
+	Convey("CLR", t, func() {
+		Convey("It returns error if register is <0 or >31", func() {
+			c := NewCPU()
+
+			So(c.CLR(32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
+		})
+
+		Convey("It clears values at given register", func() {
+			c := NewCPU()
+
+			So(c.LDI(31, 1), ShouldBeNil)
+			So(c.CLR(31), ShouldBeNil)
+
+			So(c.registers[31], ShouldEqual, 0)
+		})
+	})
 }
