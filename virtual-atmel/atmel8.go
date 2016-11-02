@@ -11,10 +11,10 @@ var (
 )
 
 type CPU struct {
-	registers       []uint8
-	rMin            int
-	rMax            int
-	carryFromLastOp bool
+	registers []uint8
+	rMin      int
+	rMax      int
+	carryFlag bool
 }
 
 // NewCPU initializes CPU with 32 registers (R0-R31). R16-R31 are exposed to
@@ -63,7 +63,7 @@ func (c *CPU) ADC(rDestIndex, rIndex int) error {
 
 // SEC is 'Set Carry Flag'; it sets carry flag.
 func (c *CPU) SEC() {
-	c.carryFromLastOp = true
+	c.carryFlag = true
 }
 
 func (c *CPU) add(rDestIndex, rIndex int, carry bool) error {
@@ -78,14 +78,14 @@ func (c *CPU) add(rDestIndex, rIndex int, carry bool) error {
 	v1, v2 := uint16(c.registers[rDestIndex]), uint16(c.registers[rIndex])
 
 	var v3 uint16 = 0
-	if carry && c.carryFromLastOp {
+	if carry && c.carryFlag {
 		v3 = 1
-		c.carryFromLastOp = false
+		c.carryFlag = false
 	}
 
 	result := v1 + v2 + v3
 	if result > 255 {
-		c.carryFromLastOp = true
+		c.carryFlag = true
 	}
 
 	c.registers[rDestIndex] = uint8(v1 + v2 + v3)

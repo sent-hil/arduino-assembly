@@ -73,17 +73,17 @@ func TestCPU(t *testing.T) {
 			So(c.LDI(16, 255), ShouldBeNil)
 			So(c.ADD(16, 16), ShouldBeNil)
 			So(c.registers[16], ShouldEqual, 254)
-			So(c.carryFromLastOp, ShouldBeTrue)
+			So(c.carryFlag, ShouldBeTrue)
 		})
 
 		Convey("It does not use previously stored carry flag", func() {
 			c := NewCPU()
-			c.carryFromLastOp = true
+			c.carryFlag = true
 
 			So(c.LDI(16, 1), ShouldBeNil)
 			So(c.ADD(16, 16), ShouldBeNil)
 			So(c.registers[16], ShouldEqual, 2)
-			So(c.carryFromLastOp, ShouldBeTrue)
+			So(c.carryFlag, ShouldBeTrue)
 		})
 	})
 
