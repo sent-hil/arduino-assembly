@@ -61,11 +61,6 @@ func (c *CPU) ADC(rDestIndex, rIndex uint8) error {
 	return c.add(rDestIndex, rIndex, true)
 }
 
-// SEC is 'Set Carry Flag'; it sets carry flag.
-func (c *CPU) SEC() {
-	c.carryFlag = true
-}
-
 // INC is 'Increment'; it increments value at register by 1. It OP causes
 // overflow, it does NOT set carry flag.
 //
@@ -120,6 +115,17 @@ func (c *CPU) MOV(rDestIndex, rOrgIndex uint8) error {
 	c.registers[rDestIndex] = c.registers[rOrgIndex]
 
 	return nil
+
+}
+
+// SEC is 'Set Carry Flag'; it sets carry flag.
+func (c *CPU) SEC() {
+	c.carryFlag = true
+}
+
+// SEC is 'Clear Carry Flag'; it clears carry flag.
+func (c *CPU) CLC() {
+	c.carryFlag = false
 }
 
 ///// private
