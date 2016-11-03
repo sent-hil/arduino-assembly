@@ -36,48 +36,10 @@ func TestCPU(t *testing.T) {
 	})
 
 	Convey("ADD", t, func() {
-		Convey("It returns error if given register indexes are not valid", func() {
-			c := NewCPU()
-
-			So(c.ADD(32, 1), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
-			So(c.ADD(1, 32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
-		})
-
-		Convey("It adds two register with empty value", func() {
-			c := NewCPU()
-
-			So(c.ADD(1, 2), ShouldBeNil)
-			So(c.registers[1], ShouldEqual, 0)
-		})
-
-		Convey("It adds register with value to itself", func() {
-			c := NewCPU()
-
-			So(c.LDI(16, 1), ShouldBeNil)
-			So(c.ADD(16, 16), ShouldBeNil)
-			So(c.registers[16], ShouldEqual, 2)
-		})
-
-		Convey("It sets result of addition of 2 registers to 1st register", func() {
-			c := NewCPU()
-
-			So(c.LDI(16, 1), ShouldBeNil)
-			So(c.LDI(17, 2), ShouldBeNil)
-			So(c.ADD(16, 17), ShouldBeNil)
-			So(c.registers[16], ShouldEqual, 3)
-		})
-
-		Convey("It sets carry flag if result overflows", func() {
-			c := NewCPU()
-
-			So(c.LDI(16, 255), ShouldBeNil)
-			So(c.ADD(16, 16), ShouldBeNil)
-			So(c.registers[16], ShouldEqual, 254)
-			So(c.carryFlag, ShouldBeTrue)
-		})
+		c := NewCPU()
+		ItActsLikeADD(c, c.ADD)
 
 		Convey("It does not use previously stored carry flag", func() {
-			c := NewCPU()
 			c.carryFlag = true
 
 			So(c.LDI(16, 1), ShouldBeNil)
@@ -88,21 +50,8 @@ func TestCPU(t *testing.T) {
 	})
 
 	Convey("ADC", t, func() {
-		Convey("It returns error if given register indexes are not valid", func() {
-			c := NewCPU()
-
-			So(c.ADC(32, 1), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
-			So(c.ADC(1, 32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
-		})
-
-		Convey("It does same ops as ADD for results <255", func() {
-			c := NewCPU()
-
-			So(c.LDI(16, 1), ShouldBeNil)
-			So(c.LDI(17, 2), ShouldBeNil)
-			So(c.ADC(16, 17), ShouldBeNil)
-			So(c.registers[16], ShouldEqual, 3)
-		})
+		c := NewCPU()
+		ItActsLikeADD(c, c.ADC)
 
 		Convey("It wraps around for results >255", func() {
 			c := NewCPU()
@@ -239,5 +188,37 @@ func TestCPU(t *testing.T) {
 			So(c.ADD(0, 0), ShouldBeNil)
 			So(c.registers[0], ShouldEqual, 0)
 		})
+	})
+}
+
+func ItActsLikeADD(c *CPU, fx func(uint8, uint8) error) {
+	Convey("It returns error if given register indexes are not valid", func() {
+		So(fx(32, 1), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
+		So(fx(1, 32), ShouldResemble, fmt.Errorf("R32 is not a valid register"))
+	})
+
+	Convey("It adds two register with empty value", func() {
+		So(fx(1, 2), ShouldBeNil)
+		So(c.registers[1], ShouldEqual, 0)
+	})
+
+	Convey("It adds register with value to itself", func() {
+		So(c.LDI(16, 1), ShouldBeNil)
+		So(fx(16, 16), ShouldBeNil)
+		So(c.registers[16], ShouldEqual, 2)
+	})
+
+	Convey("It sets result of addition of 2 registers to 1st register", func() {
+		So(c.LDI(16, 1), ShouldBeNil)
+		So(c.LDI(17, 2), ShouldBeNil)
+		So(fx(16, 17), ShouldBeNil)
+		So(c.registers[16], ShouldEqual, 3)
+	})
+
+	Convey("It sets carry flag if result overflows", func() {
+		So(c.LDI(16, 255), ShouldBeNil)
+		So(fx(16, 16), ShouldBeNil)
+		So(c.registers[16], ShouldEqual, 254)
+		So(c.carryFlag, ShouldBeTrue)
 	})
 }
