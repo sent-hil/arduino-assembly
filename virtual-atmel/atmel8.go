@@ -118,6 +118,14 @@ func (c *CPU) MOV(rDestIndex, rOrgIndex uint8) error {
 
 }
 
+func (c *CPU) SUB(rDestIndex, rIndex uint8) error {
+	return c.sub(rDestIndex, rIndex, false)
+}
+
+func (c *CPU) SBC(rDestIndex, rIndex uint8) error {
+	return c.sub(rDestIndex, rIndex, true)
+}
+
 // SEC is 'Set Carry Flag'; it sets carry flag.
 func (c *CPU) SEC() {
 	c.carryFlag = true
@@ -150,6 +158,29 @@ func (c *CPU) add(rDestIndex, rIndex uint8, carry bool) error {
 	}
 
 	c.registers[rDestIndex] = uint8(v1 + v2 + v3)
+
+	return nil
+}
+
+func (c *CPU) sub(rDestIndex, rIndex uint8, carry bool) error {
+	if err := c.checkRegisterOutofRange(rDestIndex, rIndex); err != nil {
+		return err
+	}
+
+	v1, v2 := int16(c.registers[rDestIndex]), int16(c.registers[rIndex])
+
+	var v3 int16 = 0
+	if carry && c.carryFlag {
+		v3 = 1
+		c.carryFlag = false
+	}
+
+	result := v1 - v2 - v3
+	if result < 0 {
+		c.carryFlag = true
+	}
+
+	c.registers[rDestIndex] = uint8(v1 - v2 - v3)
 
 	return nil
 }
