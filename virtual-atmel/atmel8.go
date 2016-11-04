@@ -52,8 +52,8 @@ func (c *CPU) ADD(rDestIndex, rIndex uint8) error {
 	return c.add(rDestIndex, rIndex, false)
 }
 
-// ADD is 'Add with Carry'; it adds two given registers & carry from last op.
-// It stores the results in the 1st register. It sets C flag if result
+// ADD is 'Add with Carry'; it adds two given registers & carry from last op if
+// any. It stores the results in the 1st register. It sets C flag if result
 // overflows.
 //
 // rDestIndex and rIndex must be: 0 <= d <= 31.
@@ -118,10 +118,19 @@ func (c *CPU) MOV(rDestIndex, rOrgIndex uint8) error {
 
 }
 
+// SUB is 'Subtract without Carry'; it substracts two given registers. It stores
+// the results in the 1st register. It sets C flag if result overflows.
+//
+// rDestIndex and rIndex must be: 0 <= d <= 31.
 func (c *CPU) SUB(rDestIndex, rIndex uint8) error {
 	return c.sub(rDestIndex, rIndex, false)
 }
 
+// ADD is 'Subtract with Carry'; it subtrcats two given registers & carry from last
+// op if any. It stores the results in the 1st register. It sets C flag if result
+// overflows.
+//
+// rDestIndex and rIndex must be: 0 <= d <= 31.
 func (c *CPU) SBC(rDestIndex, rIndex uint8) error {
 	return c.sub(rDestIndex, rIndex, true)
 }
