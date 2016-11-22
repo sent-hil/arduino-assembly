@@ -1,0 +1,60 @@
+type TokenId int
+
+const (
+  TokenString TokenId = iota
+  TokenERR
+)
+
+type Peeker interface {
+  Peek() (byte, error)
+}
+
+type Lexer interface {
+  Match(byte) bool
+  Lex(Peeker) (*Token, Lexer)
+}
+
+type Token struct {
+  Id    TokenId
+  Value string
+}
+
+type LexStart struct {
+}
+
+func (l *LexStart) Match(c byte) bool {
+  return &commentLexer.Match(c) || &wordLexer.Match(c)
+}
+
+func (l *LexStart) Lex(p Peeker) (*Token, Lexer) {
+  char, err := p.Peek()
+  if err != nil {
+    return &Token{Id: TokenERR}, ??
+  }
+
+  switch {
+  case &commentLexer.Match(char):
+    return &commentLexer.Lex(p)
+  case &wordLexer.Match(char):
+    return &wordLexer.Lex(p)
+  }
+
+  return ??
+}
+
+type FileLexer struct {
+  Tokens     chan *Token
+  Filename   string
+  reader     bytes.Buffer
+  currentPos *Position
+}
+
+func (f *FileLexer) Lex() {
+  var currentLexer Lexer = &lexStart{}
+  for _, err := f.Peek(); err == nil {
+    token, nextLexer := currentLexer.Lex(f)
+    f.Token <- token
+    f.Advance(len(token.Value))
+    currentLexer = nextLexer
+  }
+}
