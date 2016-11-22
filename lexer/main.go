@@ -26,6 +26,22 @@ func (w *WordLexer) Match(char byte) bool {
 	return unicode.IsLetter(rune(char))
 }
 
+type StartLexer struct {
+	Comment *CommentLexer
+	Word    *WordLexer
+}
+
+func NewStartLexer() *StartLexer {
+	return &StartLexer{
+		Comment: NewCommentLexer(),
+		Word:    NewWordLexer(),
+	}
+}
+
+func (s *StartLexer) Match(char byte) bool {
+	return s.Comment.Match(char) || s.Word.Match(char)
+}
+
 type FileLexer struct {
 	Filename string
 	reader   *bufio.Reader

@@ -10,15 +10,25 @@ import (
 func TestLexers(t *testing.T) {
 	Convey("CommentLexer", t, func() {
 		Convey("It matches only if char is '/'", func() {
-			So((NewCommentLexer()).Match(byte('/')), ShouldBeTrue)
-			So((NewCommentLexer()).Match(byte('1')), ShouldBeFalse)
+			So(NewCommentLexer().Match(byte('/')), ShouldBeTrue)
+			So(NewCommentLexer().Match(byte('1')), ShouldBeFalse)
 		})
 	})
 
 	Convey("WordLexer", t, func() {
 		Convey("It matches only if char is a unicode character", func() {
-			So((NewWordLexer()).Match(byte('a')), ShouldBeTrue)
-			So((NewWordLexer()).Match(byte('/')), ShouldBeFalse)
+			So(NewWordLexer().Match(byte('a')), ShouldBeTrue)
+			So(NewWordLexer().Match(byte('/')), ShouldBeFalse)
+		})
+	})
+
+	Convey("StartLexer", t, func() {
+		Convey("It matches '/'", func() {
+			So(NewStartLexer().Match(byte('/')), ShouldBeTrue)
+		})
+
+		Convey("It maches if char is a unicode character", func() {
+			So(NewStartLexer().Match(byte('a')), ShouldBeTrue)
 		})
 	})
 
