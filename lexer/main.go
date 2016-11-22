@@ -1,6 +1,10 @@
 package main
 
-import "unicode"
+import (
+	"bufio"
+	"os"
+	"unicode"
+)
 
 type CommentLexer struct{}
 
@@ -20,4 +24,21 @@ func NewWordLexer() *WordLexer {
 
 func (w *WordLexer) Match(char byte) bool {
 	return unicode.IsLetter(rune(char))
+}
+
+type FileLexer struct {
+	Filename string
+	reader   *bufio.Reader
+}
+
+func NewFileLexer(filename string) (*FileLexer, error) {
+	fileReader, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	return &FileLexer{
+		Filename: filename,
+		reader:   bufio.NewReader(fileReader),
+	}, nil
 }
