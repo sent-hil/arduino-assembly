@@ -1,8 +1,9 @@
 type TokenId int
 
 const (
-  TokenString TokenId = iota
-  TokenERR
+  TokenERR TokenId = iota
+  TOkenEOF
+  TokenString
 )
 
 type Peeker interface {
@@ -57,4 +58,6 @@ func (f *FileLexer) Lex() {
     f.Advance(len(token.Value))
     currentLexer = nextLexer
   }
+
+  f.Token <- TokenEOF
 }
