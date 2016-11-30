@@ -39,7 +39,8 @@ func (c *CommentLexer) Match(char byte) bool {
 	return char == byte('/')
 }
 
-func (c *CommentLexer) Lex(p Peeker) {
+func (c *CommentLexer) Lex(p Peeker) Lexer {
+	return nil
 }
 
 type WordLexer struct{}
@@ -50,6 +51,10 @@ func NewWordLexer() *WordLexer {
 
 func (w *WordLexer) Match(char byte) bool {
 	return unicode.IsLetter(rune(char))
+}
+
+func (w *WordLexer) Lex(p Peeker) Lexer {
+	return nil
 }
 
 type StartLexer struct {
@@ -90,7 +95,12 @@ func NewFileLexer(filename string) (*FileLexer, error) {
 }
 
 func (f *FileLexer) Peek() (byte, error) {
-	return byte('a'), nil
+	chars, err := f.reader.Peek(1)
+	if err != nil {
+		return byte('"'), err
+	}
+
+	return chars[0], nil
 }
 
 func (f *FileLexer) Lex() {
