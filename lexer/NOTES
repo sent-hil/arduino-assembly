@@ -6,13 +6,20 @@ const (
   TokenString
 )
 
+type Lexable interface {
+  Peek()      (rune, error)
+  PeekAt(int) (rune, error)
+  Read()      (rune, error)
+  Lex(*Token)
+}
+
 type Peeker interface {
   Peek() (byte, error)
 }
 
 type Lexer interface {
   Match(byte) bool
-  Lex(Peeker) (*Token, Lexer)
+  Lex(Peeker) (Lexer)
 }
 
 type Token struct {

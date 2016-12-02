@@ -2,59 +2,33 @@ package main
 
 import (
 	"bufio"
+	"io"
 	"os"
-	"unicode"
 )
 
-type TokenId int
+type TokenID string
 
 const (
-	TokenERR TokenId = iota
-	TokenEOF
-	TokenComment
-	TokenString
+	TokenERR     TokenID = "ERR"
+	TokenEOF             = "EOF"
+	TokenComment         = "COMMENT"
+	TokenString          = "STRING"
+	TokenInteger         = "INT"
 )
 
 type Peeker interface {
 	Peek() (byte, error)
+	PeekAt(i int) (byte, error)
 }
 
 type Lexer interface {
 	Match(byte) bool
-	Lex(Peeker) Lexer
+	Lex(Peeker) (*Token, Lexer)
 }
 
 type Token struct {
-	Id    TokenId
+	ID    TokenID
 	Value string
-}
-
-type CommentLexer struct{}
-
-func NewCommentLexer() *CommentLexer {
-	return &CommentLexer{}
-}
-
-func (c *CommentLexer) Match(char byte) bool {
-	return char == byte('/')
-}
-
-func (c *CommentLexer) Lex(p Peeker) Lexer {
-	return nil
-}
-
-type WordLexer struct{}
-
-func NewWordLexer() *WordLexer {
-	return &WordLexer{}
-}
-
-func (w *WordLexer) Match(char byte) bool {
-	return unicode.IsLetter(rune(char))
-}
-
-func (w *WordLexer) Lex(p Peeker) Lexer {
-	return nil
 }
 
 type StartLexer struct {
@@ -73,8 +47,24 @@ func (s *StartLexer) Match(char byte) bool {
 	return s.Comment.Match(char) || s.Word.Match(char)
 }
 
-func (s *StartLexer) Lex(p Peeker) Lexer {
-	return nil
+func (s *StartLexer) Lex(p Peeker) (*Token, Lexer) {
+	c, err := p.Peek()
+	if err != nil && err == io.EOF {
+		return nil, nil
+	}
+
+	if err != nil {
+		panic(err)
+	}
+
+	switch {
+	case NewCommentLexer().Match(c):
+		return nil, NewCommentLexer()
+	case NewWordLexer().Match(c):
+		return nil, NewWordLexer()
+	}
+
+	return nil, nil
 }
 
 type FileLexer struct {
@@ -103,14 +93,27 @@ func (f *FileLexer) Peek() (byte, error) {
 	return chars[0], nil
 }
 
-func (f *FileLexer) Lex() {
-	var currentLexer Lexer = NewStartLexer()
-
-	for _, err := f.Peek(); err == nil && currentLexer != nil; {
-		nextLexer := currentLexer.Lex(f)
-
-		if nextLexer != nil {
-			currentLexer = nextLexer
-		}
+func (f *FileLexer) PeekAt(i int) (byte, error) {
+	chars, err := f.reader.Peek(i)
+	if err != nil {
+		return byte('"'), err
 	}
+
+	if len(chars) == 0 {
+		return byte('"'), io.EOF
+	}
+
+	return chars[i-1:][0], nil
+}
+
+func (f *FileLexer) Lex() {
+	//var currentLexer Lexer = NewStartLexer()
+
+	//for _, err := f.Peek(); err == nil && currentLexer != nil; {
+	//  nextLexer := currentLexer.Lex(f)
+
+	//  if nextLexer != nil {
+	//    currentLexer = nextLexer
+	//  }
+	//}
 }

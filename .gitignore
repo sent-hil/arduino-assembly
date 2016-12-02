@@ -3,3 +3,4 @@
 *.hex
 *.cof
 *.obj
+tests/
