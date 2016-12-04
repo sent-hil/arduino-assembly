@@ -3,13 +3,12 @@ package lexer
 import (
 	"bufio"
 	"os"
-	"unicode"
 )
 
-type TokenId int
+type TokenID int
 
 const (
-	TokenERR TokenId = iota
+	TokenERR TokenID = iota
 	TokenEOF
 	TokenInteger
 )
@@ -22,50 +21,36 @@ type Lexer interface {
 type Lexable interface {
 	Peek() (rune, error)
 	Read() (rune, error)
+	ReadTill(func(rune) bool) string
 	Lexed(*Token)
 }
 
 type Token struct {
-	Id    TokenId
+	ID    TokenID
 	Value string
 }
 
-type IntegerLexer struct{}
-
-func NewIntegerLexer() *IntegerLexer {
-	return &IntegerLexer{}
-}
-
-func (i *IntegerLexer) Match(char rune) bool {
-	return unicode.IsDigit(char)
-}
-
-func (i *IntegerLexer) Run(p Lexable) Lexer {
-	p.Lexed(&Token{})
-	return nil
-}
-
-type FileLexer struct {
+type FileLex struct {
 	Filename string
-	Tokens   chan *Token
+	Tokens   []*Token
 
 	reader *bufio.Reader
 }
 
-func NewFileLexer(filename string) (*FileLexer, error) {
+func NewFileLex(filename string) (*FileLex, error) {
 	fileReader, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	return &FileLexer{
+	return &FileLex{
 		Filename: filename,
-		Tokens:   make(chan *Token),
+		Tokens:   make([]*Token, 0),
 		reader:   bufio.NewReader(fileReader),
 	}, nil
 }
 
-func (f *FileLexer) Peek() (rune, error) {
+func (f *FileLex) Peek() (rune, error) {
 	chars, err := f.reader.Peek(1)
 	if err != nil {
 		return 'a', err
@@ -74,7 +59,7 @@ func (f *FileLexer) Peek() (rune, error) {
 	return rune(chars[0]), nil
 }
 
-func (f *FileLexer) Read() (rune, error) {
+func (f *FileLex) Read() (rune, error) {
 	char, err := f.reader.ReadByte()
 	if err != nil {
 		return 'a', err
@@ -83,6 +68,19 @@ func (f *FileLexer) Read() (rune, error) {
 	return rune(char), nil
 }
 
-func (f *FileLexer) Lexed(t *Token) {
-	f.Tokens <- t
+func (f *FileLex) Lexed(t *Token) {
+	f.Tokens = append(f.Tokens, t)
+}
+
+func (f *FileLex) ReadTill(matcher func(rune) bool) (accum string) {
+	for {
+		char, err := f.Read()
+		if err != nil || !matcher(char) {
+			break
+		}
+
+		accum += string(char)
+	}
+
+	return accum
 }
