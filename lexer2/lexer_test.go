@@ -1,7 +1,7 @@
 package lexer
 
-import "bytes"
+import "strings"
 
 func newStringLexer(s string) *Lexer {
-	return NewLexer(bytes.NewBufferString(s))
+	return NewLexer(strings.NewReader(s))
 }

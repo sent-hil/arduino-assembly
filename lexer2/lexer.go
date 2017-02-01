@@ -40,15 +40,15 @@ func NewLexer(reader io.Reader) *Lexer {
 	runes := []rune{}
 	bufReader := bufio.NewReader(reader)
 
-	for runeChar, _, err := bufReader.ReadRune(); ; {
-		if err != nil && err != io.EOF {
-			panic(err)
-		}
-		if err == io.EOF {
+	for {
+		c, _, err := bufReader.ReadRune()
+		if err != nil && err == io.EOF {
 			break
 		}
-
-		runes = append(runes, runeChar)
+		if err != nil {
+			panic(err)
+		}
+		runes = append(runes, c)
 	}
 
 	return &Lexer{runes: runes}
